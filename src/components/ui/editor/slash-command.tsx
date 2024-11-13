@@ -9,20 +9,13 @@ import {
   ListOrdered,
   Text,
   TextQuote,
+  Twitter,
+  Youtube,
 } from "lucide-react";
 import { Command, createSuggestionItems, renderItems } from "novel/extensions";
 import { uploadFn } from "./image-upload";
 
 export const suggestionItems = createSuggestionItems([
-  // {
-  //   title: "Send Feedback",
-  //   description: "Let us know how we can improve.",
-  //   icon: <MessageSquarePlus size={18} />,
-  //   command: ({ editor, range }) => {
-  //     editor.chain().focus().deleteRange(range).run();
-  //     window.open("/feedback", "_blank");
-  //   },
-  // },
   {
     title: "Text",
     description: "Just start typing with plain text.",
@@ -147,6 +140,61 @@ export const suggestionItems = createSuggestionItems([
         }
       };
       input.click();
+    },
+  },
+  {
+    title: "Youtube",
+    description: "Embed a Youtube video.",
+    searchTerms: ["video", "youtube", "embed"],
+    icon: <Youtube size={18} />,
+    command: ({ editor, range }) => {
+      const videoLink = prompt("Please enter Youtube Video Link");
+      //From https://regexr.com/3dj5t
+      const ytregex = new RegExp(
+        /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/,
+      );
+
+      if (videoLink && ytregex.test(videoLink)) {
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .setYoutubeVideo({
+            src: videoLink,
+          })
+          .run();
+      } else {
+        if (videoLink !== null) {
+          alert("Please enter a correct Youtube Video Link");
+        }
+      }
+    },
+  },
+  {
+    title: "Twitter",
+    description: "Embed a Tweet.",
+    searchTerms: ["twitter", "embed"],
+    icon: <Twitter size={18} />,
+    command: ({ editor, range }) => {
+      const tweetLink = prompt("Please enter Twitter Link");
+      const tweetRegex = new RegExp(
+        /^https?:\/\/(www\.)?x\.com\/([a-zA-Z0-9_]{1,15})(\/status\/(\d+))?(\/\S*)?$/,
+      );
+
+      if (tweetLink && tweetRegex.test(tweetLink)) {
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .setTweet({
+            src: tweetLink,
+          })
+          .run();
+      } else {
+        if (tweetLink !== null) {
+          alert("Please enter a correct Twitter Link");
+        }
+      }
     },
   },
 ]);
