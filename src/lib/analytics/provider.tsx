@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { getEnvironment } from "../constants/constants";
 import { AnalyticsContext } from "./context";
 import { AnalyticsConfig, AnalyticsProvider } from "./interfaces";
 import { MixpanelAnalytics } from "./providers/mixpanel";
@@ -11,7 +12,7 @@ const defaultConfig: AnalyticsConfig = {
   batchSize: 20,
   flushInterval: 10000,
   retryAttempts: 3,
-  environment: process.env.NODE_ENV,
+  environment: getEnvironment(),
   validateEvents: true,
   enableOfflineQueue: true,
   maxQueueSize: 1000,

@@ -21,7 +21,6 @@ export const useAnalytics = () => {
     event: K,
     properties: EventMap[K],
   ) => {
-    console.log("Tracking event:", event, properties, { isReady, config });
     if (!isReady || !config.enabled) return;
 
     if (config.validateEvents) {
@@ -46,9 +45,10 @@ export const useAnalytics = () => {
       userId,
       teamId,
       teamSlug,
-      // remove undefined/null values
+      environment: config.environment,
     };
 
+    // remove undefined/null values
     Object.keys(enrichedProperties).forEach(key => {
       if (enrichedProperties[key] === undefined || enrichedProperties[key] === null) {
         delete enrichedProperties[key];
@@ -57,8 +57,6 @@ export const useAnalytics = () => {
 
     if (config.debug) {
       console.log(`[Analytics] Track: ${event}`, enrichedProperties);
-    } else {
-      console.log(`[Analytics][Prod] Track: ${event}`, enrichedProperties);
     }
     await provider.track(event, enrichedProperties as EventMap[K]);
   };
@@ -77,7 +75,24 @@ export const useAnalytics = () => {
     if (config.debug) {
       console.log(`[Analytics] Page: ${path}`, properties);
     }
-    await provider.page(path, properties);
+    const { userId, traits } = loadIdentity();
+    const teamId = activeTeam?._id;
+    const teamSlug = params?.team_slug as string | undefined;
+    const enrichedProperties: Record<string, any> = {
+      ...properties,
+      ...traits,
+      environment: config.environment,
+      userId,
+      teamId,
+      teamSlug,
+    };
+    // remove undefined/null values
+    Object.keys(enrichedProperties).forEach(key => {
+      if (enrichedProperties[key] === undefined || enrichedProperties[key] === null) {
+        delete enrichedProperties[key];
+      }
+    });
+    await provider.page(path, enrichedProperties);
   };
 
   const group = (groupId: string, properties?: Record<string, any>) => {
