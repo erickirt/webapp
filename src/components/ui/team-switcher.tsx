@@ -6,6 +6,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { DICEBEAR_AVATAR_URL } from "@/lib/constants/constants";
 import useTeams from "@/lib/swr/use-teams";
 import { Plan, Team } from "@/lib/types/types";
@@ -26,6 +27,7 @@ export function TeamSwitcher() {
     team_slug?: string;
     key?: string;
   };
+  const analytics = useAnalytics();
 
   const selected = useMemo(() => {
     const selectedTeam = teams?.find(
@@ -58,6 +60,20 @@ export function TeamSwitcher() {
     plan: Plan;
   };
 
+  const handleTeamClick = (teamName: string, teamSlug: string) => {
+    analytics.track("button_click", {
+      button_id: "team_switch",
+      location: "team_switcher",
+    });
+  };
+
+  const handleTeamDropdownOpen = () => {
+    analytics.track("button_click", {
+      button_id: "team_switcher_dropdown",
+      location: "navigation",
+    });
+  };
+
   if (!teams || teamsLoading) {
     return <TeamToggleDropdownPlaceholder />;
   }
@@ -69,6 +85,7 @@ export function TeamSwitcher() {
       <Link
         href={`/${selected?.slug}`}
         className="flex cursor-pointer items-center gap-1.5"
+        onClick={() => handleTeamClick(selected.name, selected.slug)}
       >
         {selected && (
           <Image
@@ -87,7 +104,10 @@ export function TeamSwitcher() {
         {selected.slug !== "/" && <Badge>{selected.plan}</Badge>}
       </Link>
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-2 focus-visible:outline-none">
+        <DropdownMenuTrigger
+          className="flex items-center gap-2 focus-visible:outline-none"
+          onClick={handleTeamDropdownOpen}
+        >
           <div className="flex items-center gap-2 rounded px-2 py-1 hover:bg-accent">
             <ChevronsUpDown size={18} />
           </div>
@@ -119,6 +139,7 @@ export function TeamSwitcher() {
                             team={team}
                             key={index}
                             selectedSlug={selected.slug}
+                            onTeamSelect={handleTeamClick}
                           />
                         ))}
                     </div>
@@ -140,10 +161,22 @@ export function TeamSwitcher() {
   );
 }
 
-function TeamRow({ team, selectedSlug }: { team: Team; selectedSlug: string }) {
+function TeamRow({
+  team,
+  selectedSlug,
+  onTeamSelect,
+}: {
+  team: Team;
+  selectedSlug: string;
+  onTeamSelect: (teamName: string, teamSlug: string) => void;
+}) {
   const isSelected = selectedSlug === team.meta.slug;
+
   return (
-    <Link href={`/${team.meta.slug}`}>
+    <Link
+      href={`/${team.meta.slug}`}
+      onClick={() => onTeamSelect(team.name, team.meta.slug)}
+    >
       <div
         className={cx(
           "flex w-full items-center  gap-2 rounded hover:bg-accent",

@@ -27,6 +27,7 @@ export class MixpanelAnalytics implements AnalyticsProvider {
     if (typeof window === "undefined" || this.isInitialized) return;
 
     try {
+      console.log("Initializing Mixpanel with token:", this.token);
       mixpanel.init(this.token, {
         debug: this.config.debug,
         persistence: "localStorage",
@@ -94,6 +95,7 @@ export class MixpanelAnalytics implements AnalyticsProvider {
     if (this.isInitialized) {
       mixpanel.identify(userId);
       if (properties) {
+        console.log("Identifying user:", { userId, properties });
         mixpanel.people.set(properties);
       }
     }

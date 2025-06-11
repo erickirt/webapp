@@ -10,6 +10,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 
 import { clearIdentity } from "@/lib/analytics/identity";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { LogOutIcon, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,6 +22,41 @@ const Nav = ({}) => {
   const { team_slug } = (useParams() as { team_slug?: string }) ?? {};
   const { data: session, status } = useSession();
   const user = session?.user;
+  const analytics = useAnalytics();
+
+  const handleLogoClick = () => {
+    analytics.track("button_click", {
+      button_id: "logo_home",
+      location: "navigation",
+    });
+  };
+
+  const handleUserAvatarClick = () => {
+    analytics.track("button_click", {
+      button_id: "user_avatar_dropdown",
+      location: "navigation",
+    });
+  };
+
+  const handleSettingsClick = () => {
+    analytics.track("button_click", {
+      button_id: "settings_nav",
+      location: "navigation",
+    });
+  };
+
+  const handleLogout = () => {
+    analytics.track("button_click", {
+      button_id: "logout",
+      location: "navigation",
+    });
+
+    // Clear analytics identity before signing out
+    clearIdentity();
+    signOut({
+      callbackUrl: `/login`,
+    });
+  };
 
   return (
     <div className="flex h-16 w-full place-content-between items-center">
@@ -28,6 +64,7 @@ const Nav = ({}) => {
         <Link
           href="/"
           className="Logo hidden items-center gap-2 sm:mr-4 sm:flex "
+          onClick={handleLogoClick}
         >
           <Logo className="h-8" />
         </Link>
@@ -40,7 +77,10 @@ const Nav = ({}) => {
         {user && Object.keys(user).length !== 0 && (
           <div className="flex items-center space-x-4 ">
             <DropdownMenu>
-              <DropdownMenuTrigger className="group">
+              <DropdownMenuTrigger
+                className="group"
+                onClick={handleUserAvatarClick}
+              >
                 <div className="bg-primary-200  flex h-10 w-10 place-content-center items-center rounded-full text-lg font-bold hover:text-teal-700">
                   <Image
                     unoptimized={true}
@@ -70,19 +110,18 @@ const Nav = ({}) => {
                 </div>
                 <ThemeSwitcher />
                 <DropdownMenuItem className="cursor-pointer">
-                  <Link href="/settings" className="flex items-center">
+                  <Link
+                    href="/settings"
+                    className="flex items-center"
+                    onClick={handleSettingsClick}
+                  >
                     <Settings size={18} className="mr-2" />
                     Settings
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onSelect={() => {
-                    clearIdentity();
-                    signOut({
-                      callbackUrl: `/login`,
-                    });
-                  }}
+                  onSelect={handleLogout}
                 >
                   <LogOutIcon size={18} className="mr-2" /> Logout
                 </DropdownMenuItem>

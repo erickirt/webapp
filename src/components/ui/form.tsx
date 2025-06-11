@@ -1,3 +1,4 @@
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { trim } from "@/lib/functions/trim";
 import { InputHTMLAttributes, ReactNode, useMemo, useState } from "react";
 import { Button2 } from "./button";
@@ -32,6 +33,8 @@ export function Form({
     inputAttrs?.defaultValue ?? inputSwitch?.checked,
   );
   const [saving, setSaving] = useState(false);
+  const analytics = useAnalytics();
+
   const saveDisabled = useMemo(() => {
     const isDisabled =
       saving ||
@@ -51,11 +54,23 @@ export function Form({
           : inputSwitch
             ? inputSwitch.name
             : "";
+
+        const formId = `${title.toLowerCase().replace(/\s+/g, "_")}_form`;
+
         try {
           await handleSubmit({
             [keyName]: value,
           });
-        } catch (error) {}
+          analytics.track("form_submission", {
+            form_id: formId,
+            status: "success",
+          });
+        } catch (error) {
+          analytics.track("form_submission", {
+            form_id: formId,
+            status: "failure",
+          });
+        }
         setSaving(false);
       }}
       className="rounded-lg border border-border bg-card"

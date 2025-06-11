@@ -21,6 +21,7 @@ export const useAnalytics = () => {
     event: K,
     properties: EventMap[K],
   ) => {
+    console.log("Tracking event:", event, properties, { isReady, config });
     if (!isReady || !config.enabled) return;
 
     if (config.validateEvents) {
@@ -56,6 +57,8 @@ export const useAnalytics = () => {
 
     if (config.debug) {
       console.log(`[Analytics] Track: ${event}`, enrichedProperties);
+    } else {
+      console.log(`[Analytics][Prod] Track: ${event}`, enrichedProperties);
     }
     await provider.track(event, enrichedProperties as EventMap[K]);
   };

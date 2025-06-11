@@ -6,8 +6,8 @@ import { AnalyticsConfig, AnalyticsProvider } from "./interfaces";
 import { MixpanelAnalytics } from "./providers/mixpanel";
 
 const defaultConfig: AnalyticsConfig = {
-  enabled: process.env.NODE_ENV === "production",
-  debug: process.env.NODE_ENV !== "production",
+  enabled: true, //process.env.NODE_ENV === "production",
+  debug: process.env.NEXT_PUBLIC_VERCEL_ENV === "production", //process.env.NODE_ENV !== "production",
   batchSize: 20,
   flushInterval: 10000,
   retryAttempts: 3,

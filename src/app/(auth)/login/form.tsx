@@ -4,6 +4,7 @@ import { Spinner } from "@/components/atom/spinner";
 import { LoadingSpinner } from "@/components/ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { Fold } from "@/lib/utils";
 import cx from "classnames";
 import { signIn } from "next-auth/react";
@@ -32,6 +33,8 @@ export function LoginForm() {
   const [clickedGithub, setClickedGithub] = useState(false);
   const [clickedSlack, setClickedSlack] = useState(false);
 
+  const analytics = useAnalytics();
+
   useEffect(() => {
     // when leave page, reset state
     return () => {
@@ -47,6 +50,12 @@ export function LoginForm() {
     setIsLoading(true);
     const email = e.target?.email?.value;
     console.log(process.env);
+
+    analytics.track("user_login", {
+      method: "email",
+      remember_me: false,
+    });
+
     fetch("/api/auth/account-exists", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -90,7 +99,10 @@ export function LoginForm() {
           onClick={async (e) => {
             e.preventDefault();
             setClickedGoogle(true);
-            // googleLogin();
+            analytics.track("user_login", {
+              method: "google",
+              remember_me: false,
+            });
             await signIn("google");
           }}
           className="flex w-1/3 place-content-center items-center rounded-sm border border-border bg-card p-1.5"
@@ -114,6 +126,10 @@ export function LoginForm() {
           onClick={async (e) => {
             setClickedGithub(true);
             e.preventDefault();
+            analytics.track("user_login", {
+              method: "github",
+              remember_me: false,
+            });
             await signIn("github");
           }}
           className="flex w-1/3 place-content-center rounded-sm border border-border bg-card p-1.5"
@@ -156,6 +172,10 @@ export function LoginForm() {
           onClick={async (e) => {
             setClickedSlack(true);
             e.preventDefault();
+            analytics.track("button_click", {
+              button_id: "slack_login",
+              location: "login_page",
+            });
             await signIn("slack");
           }}
         >
