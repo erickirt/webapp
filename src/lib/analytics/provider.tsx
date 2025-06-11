@@ -15,6 +15,7 @@ const defaultConfig: AnalyticsConfig = {
   validateEvents: true,
   enableOfflineQueue: true,
   maxQueueSize: 1000,
+  provider: "mixpanel",
 };
 
 export const AnalyticsProviderComponent: React.FC<{

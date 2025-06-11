@@ -9,6 +9,7 @@ import {
 import { signOut, useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 
+import { clearIdentity } from "@/lib/analytics/identity";
 import { LogOutIcon, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -76,7 +77,12 @@ const Nav = ({}) => {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() => signOut()}
+                  onSelect={() => {
+                    clearIdentity();
+                    signOut({
+                      callbackUrl: `/login`,
+                    });
+                  }}
                 >
                   <LogOutIcon size={18} className="mr-2" /> Logout
                 </DropdownMenuItem>

@@ -4,6 +4,8 @@ import "@/styles/prosemirror.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { PageViewTracker } from "@/lib/analytics/page-view-tracker";
 import { AnalyticsProviderComponent } from "@/lib/analytics/provider";
+import { AnalyticsSessionManager } from "@/lib/analytics/session-manager";
+import { AuthSessionProvider } from "@/lib/auth/session-provider";
 import { constructMetadata } from "@/lib/utility/construct-metadata";
 import { cn } from "@/lib/utils";
 import { inter, satoshi } from "@/styles/font";
@@ -31,14 +33,17 @@ export default function RootLayout({
       >
         <AnalyticsProviderComponent>
           <PageViewTracker />
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
+          <AuthSessionProvider>
+            <AnalyticsSessionManager />
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+          </AuthSessionProvider>
         </AnalyticsProviderComponent>
 
         <Toaster />

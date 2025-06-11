@@ -10,8 +10,10 @@ import {
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { FREE_TEAMS_LIMIT } from "@/lib/constants/pricing";
 import useTeams from "@/lib/swr/use-teams";
+import { useEffect } from "react";
 
 interface CerateWorkspaceModelProps {
   children: React.ReactNode;
@@ -19,6 +21,12 @@ interface CerateWorkspaceModelProps {
 
 export default function DashboardClient() {
   const { exceedingFreeTeam, freeTeams, loading } = useTeams();
+  const analytics = useAnalytics();
+
+  useEffect(() => {
+    analytics.track("dashboard_viewed", {});
+  }, [analytics]);
+
   return (
     <div className="">
       <div className="flex h-36 items-center border-b border-border bg-background">
@@ -36,7 +44,18 @@ export default function DashboardClient() {
               }
             >
               <CerateWorkspaceModel>
-                <Button size={"sm"} variant={"default"} disabled={loading}>
+                <Button
+                  size={"sm"}
+                  variant={"default"}
+                  disabled={loading}
+                  onClick={() => {
+                    analytics.track("button_click", {
+                      button_id: "create_team",
+                      location: "dashboard",
+                    });
+                    console.log("create team clicked");
+                  }}
+                >
                   Create Team
                 </Button>
               </CerateWorkspaceModel>
