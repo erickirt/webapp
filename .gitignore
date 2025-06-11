@@ -39,3 +39,9 @@ next-env.d.ts
 .turbo
 .env.development
 docs/
+.cursor/rules/analytics-architecture.mdc
+.cursor/rules/analytics-error-handling.mdc
+.cursor/rules/analytics-privacy-compliance.mdc
+.cursor/rules/analytics-react-integration.mdc
+.cursor/rules/analytics-testing.mdc
+.cursor/rules/analytics-validation.mdc

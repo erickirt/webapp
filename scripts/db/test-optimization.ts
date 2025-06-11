@@ -4,6 +4,7 @@ import { getIndexStats } from "@/lib/db/indexes";
 
 /**
  * Test script to verify database optimizations are working
+ * Usage: npx tsx ./scripts/db/test-optimization.ts
  */
 
 async function testDatabaseConnection() {
