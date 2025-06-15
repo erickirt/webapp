@@ -57,7 +57,7 @@ export default function UpgradeEmail({
               My name is Sonu Sharma, and I&apos;m the founder of Orgnise. I
               wanted to personally reach out to thank you for upgrading to{" "}
               <Link
-                href={planDetails.link}
+                href={planDetails?.link}
                 className="font-medium text-blue-600 no-underline"
               >
                 Orgnise.in {plan}
@@ -85,7 +85,7 @@ export default function UpgradeEmail({
             <Text className="text-sm leading-6 text-black">
               On the {plan} plan, you now have access to:
             </Text>
-            {planDetails.features.map((feature, index) => (
+            {planDetails?.features.map((feature, index) => (
               <Text className="ml-1 text-sm leading-4 text-black" key={index}>
                 ◆ {feature.text}
               </Text>
