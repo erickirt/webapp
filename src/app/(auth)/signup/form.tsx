@@ -1,5 +1,6 @@
 "use client";
 
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import cx from "classnames";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
@@ -16,6 +17,7 @@ export function SignupForm() {
   }>({});
   const searchParams = useSearchParams();
   const next = searchParams?.get("next");
+  const analytics = useAnalytics();
 
   return (
     <div className="flex h-full flex-col place-content-center items-center bg-secondary/60 py-6">
@@ -24,7 +26,10 @@ export function SignupForm() {
         <button
           onClick={async (e) => {
             e.preventDefault();
-            // googleLogin();
+            analytics.track("user_signup", {
+              method: "google",
+              source: "signup_page",
+            });
             await signIn("google");
           }}
           className="flex w-full place-content-center items-center rounded-sm border border-border bg-card p-1.5"
@@ -43,6 +48,10 @@ export function SignupForm() {
         <button
           onClick={async (e) => {
             e.preventDefault();
+            analytics.track("user_signup", {
+              method: "github",
+              source: "signup_page",
+            });
             await signIn("github");
           }}
           className="flex w-full place-content-center items-center rounded-sm border border-border bg-card p-1.5"

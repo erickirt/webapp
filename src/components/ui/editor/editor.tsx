@@ -23,6 +23,7 @@ import { defaultExtensions } from "./extensions";
 import { uploadFn } from "./image-upload";
 import { ColorSelector } from "./selectors/color-selector";
 import { LinkSelector } from "./selectors/link-selector";
+import { MathSelector } from "./selectors/math-selectors";
 import { NodeSelector } from "./selectors/node-selector";
 import { TextButtons } from "./selectors/text-buttons";
 import { slashCommand, suggestionItems } from "./slash-command";
@@ -52,9 +53,6 @@ const Editor = ({
   const debouncedUpdates = useDebouncedCallback(
     async (editor: EditorInstance) => {
       onDebouncedUpdate?.(editor);
-      // const json = editor.getJSON();
-      // window.localStorage.setItem("novel-content", JSON.stringify(json));
-      // setSaveStatus("Saved");
     },
     500,
   );
@@ -160,6 +158,8 @@ const Editor = ({
             <Separator orientation="vertical" />
 
             <LinkSelector open={openLink} onOpenChange={setOpenLink} />
+            <Separator orientation="vertical" />
+            <MathSelector />
             <Separator orientation="vertical" />
             <TextButtons />
             <Separator orientation="vertical" />

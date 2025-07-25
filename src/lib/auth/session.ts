@@ -5,6 +5,10 @@ import { Session, getSession, hashToken } from "./";
 import { MongoClient } from "mongodb";
 
 
+/**
+ * @param handler - The handler function to wrap with session management
+ * @returns A function that can be used as a Next.js API route handler
+ */
 interface WithSessionHandler {
   ({
     req,
@@ -21,14 +25,18 @@ interface WithSessionHandler {
   }): Promise<Response>;
 }
 
-
+/**
+ * Wraps a handler function with session management
+ * @param handler - The handler function to wrap with session management
+ * @returns A function that can be used as a Next.js API route handler
+ */
 export const withSession =
   (handler: WithSessionHandler) =>
     async (req: Request, { params }: { params: Record<string, string> }) => {
       try {
-        let session: Session | undefined;
+
         const client = await mongodb;
-        session = await generateSession(req, client);
+        let session = await generateSession(req, client);
 
         const searchParams = getSearchParams(req.url);
         return await handler({ req, params, searchParams, session, client });
@@ -45,50 +53,30 @@ export async function generateSession(req: Request, client: MongoClient): Promis
       throw new OrgniseApiError({
         code: "bad_request",
         message:
-          "Misconfigured authorization header. Did you forget to add 'Bearer '? Learn more: https://https://docs.orgnise.in/api-reference/introduction#authentication",
+          "Misconfigured authorization header. Did you forget to add 'Bearer '? Learn more: https://docs.orgnise.in/api-reference/introduction#authentication",
       });
     }
 
     const apiKey = authorizationHeader.replace("Bearer ", "");
+    if (!apiKey || apiKey === "") {
+      throw new OrgniseApiError({
+        code: "bad_request",
+        message: "Invalid API key",
+      });
+    }
     const hashedKey = hashToken(apiKey, {
       noSecret: true,
     });
 
     const userCollection = client.db(databaseName).collection("users");
 
-    const users = await userCollection.aggregate([
-      {
-        $lookup: {
-          from: "token",
-          localField: "_id",
-          foreignField: "user",
-          as: "tokens",
-        },
-      },
-      {
-        $match:
-        {
-          tokens: {
-            $elemMatch: {
-              hashedKey:
-                hashedKey
-            },
-          },
-        },
-      },
-      {
-        $unwind: "$tokens",
-      },
-      {
-        $project:
-        {
-          name: 1,
-          email: 1,
-          image: 1,
-        },
-      },
-    ]).toArray() as any[];
-    const user = users?.[0];
+    const user = await userCollection.findOne({
+      _id: {
+        $in: await client.db(databaseName).collection("token")
+          .distinct("user", { hashedKey })
+      }
+    }, { projection: { name: 1, email: 1, image: 1 } });
+
     if (!user) {
       throw new OrgniseApiError({
         code: "unauthorized",
@@ -99,7 +87,7 @@ export async function generateSession(req: Request, client: MongoClient): Promis
 
     session = {
       user: {
-        id: user._id,
+        id: user._id.toString(),
         name: user.name || "",
         email: user.email || "",
       },

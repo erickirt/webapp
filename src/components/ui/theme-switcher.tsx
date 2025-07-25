@@ -7,12 +7,30 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAnalytics } from "@/lib/analytics/useAnalytics";
 import { Laptop, Moon, Sun } from "lucide-react";
 
 import { useTheme } from "next-themes";
 
 export function ThemeSwitcher() {
   const { setTheme, theme } = useTheme();
+  const analytics = useAnalytics();
+
+  const handleThemeChange = (newTheme: string) => {
+    analytics.track("button_click", {
+      button_id: `theme_${newTheme}`,
+      location: "theme_switcher",
+    });
+
+    setTheme(newTheme);
+
+    // Handle the Novel editor workaround
+    if (newTheme === "dark") {
+      document.documentElement.classList.add("dark-theme");
+    } else {
+      document.documentElement.classList.remove("dark-theme");
+    }
+  };
 
   return (
     <DropdownMenuSub>
@@ -33,31 +51,21 @@ export function ThemeSwitcher() {
         <DropdownMenuSubContent className="rounded-md border-border">
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => {
-              setTheme("light");
-              document.documentElement.classList.remove("dark-theme");
-            }}
+            onClick={() => handleThemeChange("light")}
           >
             <Sun className="mr-2 h-[1.2rem] w-[1.2rem]" />
             <span>Light</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => {
-              setTheme("dark");
-              // Workaround for the Novel editor
-              document.documentElement.classList.add("dark-theme");
-            }}
+            onClick={() => handleThemeChange("dark")}
           >
             <Moon className=" mr-2 h-[1.2rem] w-[1.2rem]" />
             <span>Dark</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => {
-              setTheme("system");
-              document.documentElement.classList.remove("dark-theme");
-            }}
+            onClick={() => handleThemeChange("system")}
           >
             <Laptop className=" mr-2 h-[1.2rem] w-[1.2rem] " />
             <span>System</span>

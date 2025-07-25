@@ -195,7 +195,7 @@ function CollectionNameField({
         defaultValue={name}
         required
         name="name"
-        placeholder="Untitled collection"
+        placeholder="Untitled page"
       />
       <Button
         type="submit"
