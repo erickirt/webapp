@@ -2,7 +2,6 @@ import "@/styles/global.css";
 import "@/styles/prosemirror.css";
 
 import { ThemeProvider } from "@/components/ui/theme-provider";
-import { PageViewTracker } from "@/lib/analytics/page-view-tracker";
 import { AnalyticsProviderComponent } from "@/lib/analytics/provider";
 import { AnalyticsSessionManager } from "@/lib/analytics/session-manager";
 import { AuthSessionProvider } from "@/lib/auth/session-provider";
@@ -32,7 +31,7 @@ export default function RootLayout({
         )}
       >
         <AnalyticsProviderComponent>
-          <PageViewTracker />
+          {/* <PageViewTracker /> */}
           <AuthSessionProvider>
             <AnalyticsSessionManager />
             <ThemeProvider
